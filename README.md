@@ -5,4 +5,12 @@
 <a href="https://github.com/gorilla/mux" target="_blank"><img src="./github_resources/gorilla.png" height="100px" width="100px" style="margin-left:1em"/></a>
 </p>
 
-
+| HTTP Verb | Endpoint                               | Description                  |
+|   :---:   |  :----:                                |    :---:                     |
+| GET       | /products                              | get all products             |
+| GET       | /products/:id                          | get product by id            |
+| POST      | /products                              | add product                  |
+| PUT       | /products/:id                          | update product by id         |
+| DELETE    | /products/:id                          | delete product by id         |
+| GET       | /products/search                       | get all possible search keys |
+| GET       | /products/search?searchKey=searchValue | get products by search       |

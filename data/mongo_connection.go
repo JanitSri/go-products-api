@@ -58,3 +58,19 @@ func (m mongoDB) ping() {
 	}
 	fmt.Println("Successfully connected and pinged.")
 }
+
+func (m mongoDB) read(filter interface{}) Products {
+	productsCollection := m.client.Database(m.database).Collection("Products")
+	cursor, err := productsCollection.Find(m.ctx, filter)
+	defer cursor.Close(m.ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	var results Products
+	if err = cursor.All(m.ctx, &results); err != nil {
+		panic(err)
+	}
+
+	return results
+}

@@ -13,6 +13,6 @@ func main() {
 	mongo := data.NewMongoDB(mongoUsername, mongoPassword, mongoDB)
 	data.InitializeDBConnection(mongo)
 	defer data.CloseDBConnection(mongo)
-	//data.GetAllProducts(*mongo)
-	data.GetProductByProductId(*mongo, 55)
+	//data.GetAllProducts(mongo)
+	data.GetProductByProductId(mongo, 2)
 }

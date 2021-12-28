@@ -35,39 +35,26 @@ func (p Product) toJson() string {
 	return string(b)
 }
 
-func GetAllProducts(m mongoDB) Products {
-	productsCollection := m.client.Database(m.database).Collection("Products")
-	cursor, err := productsCollection.Find(m.ctx, bson.D{})
-	defer cursor.Close(m.ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	var results Products
-	if err = cursor.All(m.ctx, &results); err != nil {
-		panic(err)
-	}
-
+func GetAllProducts(d dataStore) Products {
+	results := readData(d, bson.D{})
 	for _, result := range results {
 		fmt.Println(result.toJson())
 	}
-
 	return results
 }
 
-func GetProductByProductId(m mongoDB, productId uint32) {
-	productsCollection := m.client.Database(m.database).Collection("Products")
+func GetProductByProductId(d dataStore, productId uint32) {
 	filter := bson.D{{"id", productId}}
+	results := readData(d, filter)
 
-	cursor, err := productsCollection.Find(m.ctx, filter)
-	defer cursor.Close(m.ctx)
-	if err != nil {
-		panic(err)
+	if len(results) == 0 {
+		notFound := `{"Error":"Resource Not Found"}`
+		rawNotFound := json.RawMessage(notFound)
+		bytes, _ := rawNotFound.MarshalJSON()
+		fmt.Println(string(bytes))
+		return
 	}
-	var results Products
-	if err = cursor.All(m.ctx, &results); err != nil {
-		panic(err)
-	}
+
 	for _, result := range results {
 		fmt.Println(result.toJson())
 	}

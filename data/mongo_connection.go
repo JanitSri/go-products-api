@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -45,12 +44,6 @@ func (m *mongoDB) connect() {
 	}
 
 	m.client = client
-
-	databases, err := m.client.ListDatabaseNames(m.ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(databases)
 }
 
 func (m mongoDB) disconnect() {

@@ -64,11 +64,22 @@ func (m mongoDB) ping() {
 }
 
 func (m mongoDB) read(productId int) Products {
-	productsCollection := m.client.Database(m.database).Collection("Products")
 	filter := bson.D{{"id", productId}}
 	if productId == -1 {
 		filter = bson.D{{}}
 	}
+
+	return find(m, filter)
+}
+
+func (m mongoDB) search(searchTerm string) Products {
+	filter := bson.D{{"$text", bson.D{{"$search", searchTerm}}}}
+
+	return find(m, filter)
+}
+
+func find(m mongoDB, filter bson.D) Products {
+	productsCollection := m.client.Database(m.database).Collection("Products")
 
 	cursor, err := productsCollection.Find(m.ctx, filter)
 	defer cursor.Close(m.ctx)

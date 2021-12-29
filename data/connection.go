@@ -5,6 +5,7 @@ type dataStore interface {
 	disconnect()
 	ping()
 	read(productId int) Products
+	search(searchTerm string) Products
 	create(p Product) string
 	delete(productId int) int
 	update(p Product) int
@@ -40,4 +41,8 @@ func deleteData(d dataStore, productId int) int {
 
 func updateData(d dataStore, p Product) int {
 	return d.update(p)
+}
+
+func searchData(d dataStore, searchTerm string) Products {
+	return d.search(searchTerm)
 }

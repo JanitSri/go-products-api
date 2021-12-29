@@ -31,7 +31,7 @@ func main() {
 
 	data.AddProduct(mongo, product)*/
 
-	data.DeleteProduct(mongo, 90)
+	//data.DeleteProduct(mongo, 90)
 
 	/*updateProduct := data.Product{
 		ProductId: 90,
@@ -46,4 +46,5 @@ func main() {
 
 	data.UpdateProduct(mongo, updateProduct)*/
 
+	data.SearchProducts(mongo, "jacket")
 }

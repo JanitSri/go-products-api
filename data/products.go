@@ -41,7 +41,7 @@ func (p Product) getProductId() uint32 {
 func GetAllProducts(d dataStore) Products {
 	results := readData(d)
 	for _, result := range results {
-		fmt.Println(result.toJson())
+		fmt.Println(string(result.toJson()))
 	}
 	return results
 }
@@ -58,7 +58,7 @@ func GetProductByProductId(d dataStore, productId uint32) {
 	}
 
 	for _, result := range results {
-		fmt.Println(result.toJson())
+		fmt.Println(string(result.toJson()))
 	}
 }
 
@@ -75,4 +75,12 @@ func DeleteProduct(d dataStore, productId uint32) {
 func UpdateProduct(d dataStore, p Product) {
 	result := updateData(d, p)
 	fmt.Println("Number of Products Updated", result)
+}
+
+func SearchProducts(d dataStore, searchTerm string) {
+	results := searchData(d, searchTerm)
+
+	for _, result := range results {
+		fmt.Println(string(result.toJson()))
+	}
 }

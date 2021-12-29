@@ -2,8 +2,10 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -120,4 +122,43 @@ func (m mongoDB) update(p Product) int {
 	}
 
 	return int(result.ModifiedCount)
+}
+
+func productStructToMap(p Product) map[string]interface{} {
+	var productStructMap map[string]interface{}
+	product_json := p.toJson()
+	json.Unmarshal(product_json, &productStructMap)
+	return productStructMap
+}
+
+func buildUpdate(m map[string]interface{}) bson.M {
+	update := buildUpdateHelper(m, "")
+	return bson.M{"$set": update}
+}
+
+func buildUpdateHelper(m map[string]interface{}, prefix string) bson.M {
+	update := bson.M{}
+	for key, value := range m {
+		switch valueTypeConv := value.(type) {
+		default:
+			//fmt.Printf("%v, %v, %T\n", key, value, valueTypeConv)
+
+			if key == "_id" {
+				continue
+			}
+
+			if reflect.ValueOf(valueTypeConv).Kind() == reflect.Map {
+				innerM := valueTypeConv.(map[string]interface{})
+				innerUpdate := buildUpdateHelper(innerM, fmt.Sprintf("%s.", key))
+
+				// flatten the map
+				for innerKey, innerVal := range innerUpdate {
+					update[key+"."+innerKey] = innerVal
+				}
+			} else {
+				update[key] = valueTypeConv
+			}
+		}
+	}
+	return update
 }

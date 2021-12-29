@@ -12,5 +12,4 @@
 | POST      | /products                              | add product                  |
 | PUT       | /products/:id                          | update product by id         |
 | DELETE    | /products/:id                          | delete product by id         |
-| GET       | /products/search                       | get all possible search keys |
 | GET       | /products/search?searchKey=searchValue | get products by search       |

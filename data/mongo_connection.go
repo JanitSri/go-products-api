@@ -6,6 +6,8 @@ import (
 	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -59,8 +61,13 @@ func (m mongoDB) ping() {
 	fmt.Println("Successfully connected and pinged.")
 }
 
-func (m mongoDB) read(filter interface{}) Products {
+func (m mongoDB) read(productId int) Products {
 	productsCollection := m.client.Database(m.database).Collection("Products")
+	filter := bson.D{{"id", productId}}
+	if productId == -1 {
+		filter = bson.D{{}}
+	}
+
 	cursor, err := productsCollection.Find(m.ctx, filter)
 	defer cursor.Close(m.ctx)
 	if err != nil {
@@ -73,4 +80,44 @@ func (m mongoDB) read(filter interface{}) Products {
 	}
 
 	return results
+}
+
+func (m mongoDB) create(p Product) string {
+	productsCollection := m.client.Database(m.database).Collection("Products")
+	result, err := productsCollection.InsertOne(m.ctx, p)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return result.InsertedID.(primitive.ObjectID).Hex()
+}
+
+func (m mongoDB) delete(productId int) int {
+	productsCollection := m.client.Database(m.database).Collection("Products")
+	filter := bson.D{{"id", productId}}
+	result, err := productsCollection.DeleteOne(m.ctx, filter)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return int(result.DeletedCount)
+}
+
+func (m mongoDB) update(p Product) int {
+	productsCollection := m.client.Database(m.database).Collection("Products")
+
+	id := p.getProductId()
+	interfaceMap := productStructToMap(p)
+	update := buildUpdate(interfaceMap)
+
+	filter := bson.D{{"id", id}}
+	result, err := productsCollection.UpdateOne(m.ctx, filter, update)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return int(result.ModifiedCount)
 }

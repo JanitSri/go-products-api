@@ -97,6 +97,7 @@ func find(m mongoDB, filter bson.D) Products {
 
 func (m mongoDB) create(p Product) string {
 	productsCollection := m.client.Database(m.database).Collection("Products")
+	p.ProductId = getNewProductId(productsCollection, m.ctx)
 	result, err := productsCollection.InsertOne(m.ctx, p)
 
 	if err != nil {
@@ -106,6 +107,21 @@ func (m mongoDB) create(p Product) string {
 	return result.InsertedID.(primitive.ObjectID).Hex()
 }
 
+func getNewProductId(coll *mongo.Collection, ctx context.Context) uint32 {
+
+	filter := bson.D{}
+	sort := bson.D{{"id", -1}}
+	opts := options.FindOne().SetSort(sort)
+
+	var p Product
+	err := coll.FindOne(ctx, filter, opts).Decode(&p)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return p.ProductId + 1
+}
 func (m mongoDB) delete(productId int) int {
 	productsCollection := m.client.Database(m.database).Collection("Products")
 	filter := bson.D{{"id", productId}}

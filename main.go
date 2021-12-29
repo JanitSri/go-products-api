@@ -17,7 +17,6 @@ func main() {
 	//data.GetProductByProductId(mongo, 2)
 
 	/*product := data.Product{
-		ProductId:   90,
 		Title:       "Test Item",
 		Price:       99.99,
 		Description: "Test Description",
@@ -46,5 +45,5 @@ func main() {
 
 	data.UpdateProduct(mongo, updateProduct)*/
 
-	data.SearchProducts(mongo, "jacket")
+	//data.SearchProducts(mongo, "jacket")
 }

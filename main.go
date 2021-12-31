@@ -74,6 +74,10 @@ func main() {
 	deleteRouter := r.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/products/{id:[0-9]+}", p.DeleteProductHandler)
 
+	putRouter := r.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/products", p.UpdateProductHandler)
+	putRouter.Use(p.MiddlewareValidateProduct)
+
 	s := &http.Server{
 		Addr:         bindAddr,
 		Handler:      r,

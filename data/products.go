@@ -68,9 +68,9 @@ func DeleteProduct(d DataStore, productId uint32) int {
 	return result
 }
 
-func UpdateProduct(d DataStore, p Product) {
+func UpdateProduct(d DataStore, p Product) int {
 	result := updateData(d, p)
-	fmt.Println("Number of Products Updated", result)
+	return result
 }
 
 func SearchProducts(d DataStore, searchTerm string) {

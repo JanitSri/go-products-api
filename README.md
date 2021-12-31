@@ -10,6 +10,6 @@
 | GET       | /products                              | get all products             |
 | GET       | /products/:id                          | get product by id            |
 | POST      | /products                              | add product                  |
-| PUT       | /products/:id                          | update product by id         |
+| PUT       | /products                              | update product               |
 | DELETE    | /products/:id                          | delete product by id         |
 | GET       | /products/search?searchKey=searchValue | get products by search       |

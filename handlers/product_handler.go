@@ -75,6 +75,17 @@ func (p *Products) DeleteProductHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write(bytes)
 }
 
+func (p *Products) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
+	p.l.Println("PUT - Update Product")
+
+	prod := r.Context().Value(KeyProduct{}).(data.Product)
+	result := data.UpdateProduct(p.db, prod)
+	res := fmt.Sprintf(`{"Number of Product Updated":"%d"}`, result)
+	rawNotFound := json.RawMessage(res)
+	bytes, _ := rawNotFound.MarshalJSON()
+	w.Write(bytes)
+}
+
 type KeyProduct struct{}
 
 func (p Products) MiddlewareValidateProduct(next http.Handler) http.Handler {

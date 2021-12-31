@@ -142,11 +142,16 @@ func (m mongoDB) update(p Product) int {
 	productsCollection := m.client.Database(m.database).Collection("Products")
 
 	id := p.getProductId()
+
+	if id == 0 {
+		return 0
+	}
+
 	interfaceMap := productStructToMap(p)
 	update := buildUpdate(interfaceMap)
 
 	filter := bson.D{{"id", id}}
-	result, err := productsCollection.UpdateOne(m.ctx, filter, update)
+	result, err := productsCollection.UpdateOne(context.TODO(), filter, update)
 
 	if err != nil {
 		panic(err)

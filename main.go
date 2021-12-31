@@ -1,8 +1,14 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	"os"
 	"products-api/config"
 	"products-api/data"
+	"products-api/handlers"
+
+	"github.com/gorilla/mux"
 )
 
 var mongoUsername = config.GetEnvVaraiable("MONGO_USERNAME")
@@ -46,4 +52,24 @@ func main() {
 	data.UpdateProduct(mongo, updateProduct)*/
 
 	//data.SearchProducts(mongo, "jacket")
+
+	l := log.New(os.Stdout, "products-api", log.LstdFlags)
+	p := handlers.NewProducts(l, mongo)
+
+	r := mux.NewRouter()
+
+	getRouter := r.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/products", p.GetProductHandler)
+	getRouter.HandleFunc("/products/{id:[0-9]+}", p.GetProductByIdHandler)
+
+	postRouter := r.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/products", p.AddProductHandler)
+	postRouter.Use(p.MiddlewareValidateProduct)
+
+	l.Println("Starting server on port 8000")
+	err := http.ListenAndServe(":8000", r)
+	if err != nil {
+		l.Printf("Error starting server: %s\n", err)
+		os.Exit(1)
+	}
 }

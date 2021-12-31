@@ -42,7 +42,8 @@ func (m *mongoDB) connect() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = client.Connect(m.ctx)
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +52,8 @@ func (m *mongoDB) connect() {
 }
 
 func (m mongoDB) disconnect() {
-	if err := m.client.Disconnect(m.ctx); err != nil {
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	if err := m.client.Disconnect(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -81,15 +83,17 @@ func (m mongoDB) search(searchTerm string) Products {
 func find(m mongoDB, filter bson.D) Products {
 	productsCollection := m.client.Database(m.database).Collection("Products")
 
-	cursor, err := productsCollection.Find(m.ctx, filter)
+	cursor, err := productsCollection.Find(context.TODO(), filter)
 	defer cursor.Close(m.ctx)
 	if err != nil {
-		panic(err)
+		fmt.Println("Find Error: ", err)
+		return nil
 	}
 
 	var results Products
 	if err = cursor.All(m.ctx, &results); err != nil {
-		panic(err)
+		fmt.Println("Find Error: ", err)
+		return nil
 	}
 
 	return results
@@ -97,8 +101,8 @@ func find(m mongoDB, filter bson.D) Products {
 
 func (m mongoDB) create(p Product) string {
 	productsCollection := m.client.Database(m.database).Collection("Products")
-	p.ProductId = getNewProductId(productsCollection, m.ctx)
-	result, err := productsCollection.InsertOne(m.ctx, p)
+	p.ProductId = getNewProductId(productsCollection, context.TODO())
+	result, err := productsCollection.InsertOne(context.TODO(), p)
 
 	if err != nil {
 		panic(err)

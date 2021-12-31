@@ -1,6 +1,6 @@
 package data
 
-type dataStore interface {
+type DataStore interface {
 	connect()
 	disconnect()
 	ping()
@@ -11,38 +11,38 @@ type dataStore interface {
 	update(p Product) int
 }
 
-func InitializeDBConnection(d dataStore) {
+func InitializeDBConnection(d DataStore) {
 	d.connect()
 }
 
-func HealthCheck(d dataStore) {
+func HealthCheck(d DataStore) {
 	d.ping()
 }
 
-func CloseDBConnection(d dataStore) {
+func CloseDBConnection(d DataStore) {
 	d.disconnect()
 }
 
-func readData(d dataStore) Products {
+func readData(d DataStore) Products {
 	return readDataById(d, -1)
 }
 
-func readDataById(d dataStore, productId int) Products {
+func readDataById(d DataStore, productId int) Products {
 	return d.read(productId)
 }
 
-func insertData(d dataStore, p Product) string {
+func insertData(d DataStore, p Product) string {
 	return d.create(p)
 }
 
-func deleteData(d dataStore, productId int) int {
+func deleteData(d DataStore, productId int) int {
 	return d.delete(productId)
 }
 
-func updateData(d dataStore, p Product) int {
+func updateData(d DataStore, p Product) int {
 	return d.update(p)
 }
 
-func searchData(d dataStore, searchTerm string) Products {
+func searchData(d DataStore, searchTerm string) Products {
 	return d.search(searchTerm)
 }

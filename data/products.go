@@ -38,46 +38,42 @@ func (p Product) getProductId() uint32 {
 	return p.ProductId
 }
 
-func GetAllProducts(d dataStore) Products {
+func GetAllProducts(d DataStore) Products {
 	results := readData(d)
-	for _, result := range results {
-		fmt.Println(string(result.toJson()))
+
+	if results == nil {
+		return nil
 	}
+
 	return results
 }
 
-func GetProductByProductId(d dataStore, productId uint32) {
+func GetProductByProductId(d DataStore, productId uint32) Products {
 	results := readDataById(d, int(productId))
 
 	if len(results) == 0 {
-		notFound := `{"Error":"Resource Not Found"}`
-		rawNotFound := json.RawMessage(notFound)
-		bytes, _ := rawNotFound.MarshalJSON()
-		fmt.Println(string(bytes))
-		return
+		return nil
 	}
 
-	for _, result := range results {
-		fmt.Println(string(result.toJson()))
-	}
+	return results
 }
 
-func AddProduct(d dataStore, p Product) {
+func AddProduct(d DataStore, p Product) string {
 	result := insertData(d, p)
-	fmt.Printf("Added Product with ID %s\n", result)
+	return result
 }
 
-func DeleteProduct(d dataStore, productId uint32) {
+func DeleteProduct(d DataStore, productId uint32) {
 	result := deleteData(d, int(productId))
 	fmt.Printf("Number of Products Deleted: %d\n", result)
 }
 
-func UpdateProduct(d dataStore, p Product) {
+func UpdateProduct(d DataStore, p Product) {
 	result := updateData(d, p)
 	fmt.Println("Number of Products Updated", result)
 }
 
-func SearchProducts(d dataStore, searchTerm string) {
+func SearchProducts(d DataStore, searchTerm string) {
 	results := searchData(d, searchTerm)
 
 	for _, result := range results {

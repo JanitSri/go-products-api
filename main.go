@@ -66,6 +66,7 @@ func main() {
 	getRouter := r.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/products", p.GetProductHandler)
 	getRouter.HandleFunc("/products/{id:[0-9]+}", p.GetProductByIdHandler)
+	getRouter.HandleFunc("/products/search", p.SearchProductHandler)
 
 	postRouter := r.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/products", p.AddProductHandler)

@@ -73,10 +73,7 @@ func UpdateProduct(d DataStore, p Product) int {
 	return result
 }
 
-func SearchProducts(d DataStore, searchTerm string) {
+func SearchProducts(d DataStore, searchTerm string) Products {
 	results := searchData(d, searchTerm)
-
-	for _, result := range results {
-		fmt.Println(string(result.toJson()))
-	}
+	return results
 }

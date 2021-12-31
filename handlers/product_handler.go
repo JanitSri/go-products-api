@@ -28,6 +28,7 @@ func (p *Products) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 	d, err := json.Marshal(lp)
 	if err != nil {
 		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -43,6 +44,7 @@ func (p *Products) GetProductByIdHandler(w http.ResponseWriter, r *http.Request)
 	d, err := json.Marshal(lp)
 	if err != nil {
 		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
+		return
 	}
 
 	if string(d) == "null" {
@@ -92,6 +94,29 @@ func (p *Products) UpdateProductHandler(w http.ResponseWriter, r *http.Request) 
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(bytes)
+}
+
+func (p *Products) SearchProductHandler(w http.ResponseWriter, r *http.Request) {
+	p.l.Println("GET - SEARCH PRODUCTS")
+
+	searchKey := r.FormValue("searchKey")
+
+	sp := data.SearchProducts(p.db, searchKey)
+	ps, err := json.Marshal(sp)
+
+	if err != nil {
+		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
+		return
+	}
+
+	if string(ps) == "null" {
+		res := fmt.Sprintf(`{"Result":"%s"}`, string(ps))
+		rawNotFound := json.RawMessage(res)
+		ps, _ = rawNotFound.MarshalJSON()
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(ps)
 }
 
 type KeyProduct struct{}

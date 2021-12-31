@@ -20,18 +20,15 @@ type mongoDB struct {
 	password string
 	database string
 	client   *mongo.Client
-	ctx      context.Context
 }
 
 func NewMongoDB(username string, password string, database string) *mongoDB {
 	var client *mongo.Client
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	return &mongoDB{
 		username,
 		password,
 		database,
 		client,
-		ctx,
 	}
 }
 
@@ -84,14 +81,14 @@ func find(m mongoDB, filter bson.D) Products {
 	productsCollection := m.client.Database(m.database).Collection("Products")
 
 	cursor, err := productsCollection.Find(context.TODO(), filter)
-	defer cursor.Close(m.ctx)
+	defer cursor.Close(context.TODO())
 	if err != nil {
 		fmt.Println("Find Error: ", err)
 		return nil
 	}
 
 	var results Products
-	if err = cursor.All(m.ctx, &results); err != nil {
+	if err = cursor.All(context.TODO(), &results); err != nil {
 		fmt.Println("Find Error: ", err)
 		return nil
 	}

@@ -129,7 +129,7 @@ func getNewProductId(coll *mongo.Collection, ctx context.Context) uint32 {
 func (m mongoDB) delete(productId int) int {
 	productsCollection := m.client.Database(m.database).Collection("Products")
 	filter := bson.D{{"id", productId}}
-	result, err := productsCollection.DeleteOne(m.ctx, filter)
+	result, err := productsCollection.DeleteOne(context.TODO(), filter)
 
 	if err != nil {
 		panic(err)

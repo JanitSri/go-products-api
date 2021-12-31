@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"products-api/config"
 	"products-api/data"
 	"products-api/handlers"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -14,6 +17,8 @@ import (
 var mongoUsername = config.GetEnvVaraiable("MONGO_USERNAME")
 var mongoPassword = config.GetEnvVaraiable("MONGO_PASSWORD")
 var mongoDB = config.GetEnvVaraiable("MONGO_DATABASE")
+
+const bindAddr = ":8000"
 
 func main() {
 	mongo := data.NewMongoDB(mongoUsername, mongoPassword, mongoDB)
@@ -53,7 +58,7 @@ func main() {
 
 	//data.SearchProducts(mongo, "jacket")
 
-	l := log.New(os.Stdout, "products-api", log.LstdFlags)
+	l := log.New(os.Stdout, "products-api: ", log.LstdFlags)
 	p := handlers.NewProducts(l, mongo)
 
 	r := mux.NewRouter()
@@ -66,10 +71,32 @@ func main() {
 	postRouter.HandleFunc("/products", p.AddProductHandler)
 	postRouter.Use(p.MiddlewareValidateProduct)
 
-	l.Println("Starting server on port 8000")
-	err := http.ListenAndServe(":8000", r)
-	if err != nil {
-		l.Printf("Error starting server: %s\n", err)
-		os.Exit(1)
+	deleteRouter := r.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/products/{id:[0-9]+}", p.DeleteProductHandler)
+
+	s := &http.Server{
+		Addr:         bindAddr,
+		Handler:      r,
+		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  1 * time.Second,
+		WriteTimeout: 1 * time.Second,
 	}
+
+	go func() {
+		l.Println("Starting server on port 8000")
+		err := s.ListenAndServe()
+		if err != nil {
+			l.Fatal(err)
+		}
+	}()
+
+	sigChan := make(chan os.Signal)
+	signal.Notify(sigChan, os.Interrupt)
+	signal.Notify(sigChan, os.Kill)
+
+	sig := <-sigChan
+	l.Println("Recieved terminate", sig)
+
+	tc, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	s.Shutdown(tc)
 }

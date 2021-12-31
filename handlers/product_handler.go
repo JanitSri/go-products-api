@@ -30,6 +30,7 @@ func (p *Products) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(d)
 }
 
@@ -49,6 +50,7 @@ func (p *Products) GetProductByIdHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(d)
 }
 
@@ -60,6 +62,8 @@ func (p *Products) AddProductHandler(w http.ResponseWriter, r *http.Request) {
 	res := fmt.Sprintf(`{"Product Added With Mongo ID":"%s"}`, result)
 	rawNotFound := json.RawMessage(res)
 	bytes, _ := rawNotFound.MarshalJSON()
+
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(bytes)
 }
 
@@ -72,6 +76,8 @@ func (p *Products) DeleteProductHandler(w http.ResponseWriter, r *http.Request) 
 	res := fmt.Sprintf(`{"Number of Products Deleted":"%d"}`, result)
 	rawNotFound := json.RawMessage(res)
 	bytes, _ := rawNotFound.MarshalJSON()
+
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(bytes)
 }
 
@@ -83,6 +89,8 @@ func (p *Products) UpdateProductHandler(w http.ResponseWriter, r *http.Request) 
 	res := fmt.Sprintf(`{"Number of Product Updated":"%d"}`, result)
 	rawNotFound := json.RawMessage(res)
 	bytes, _ := rawNotFound.MarshalJSON()
+
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(bytes)
 }
 

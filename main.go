@@ -1,3 +1,23 @@
+// Package classification Products API.
+//
+// The products API will allow for reading, creating, updating,
+// deleting, & searching for products. It was built using GO, gorilla/mux,
+// and mongo-go-driver. Go-swagger was used for API documentation.
+//
+//     Schemes: http
+//     Host: localhost
+//     BasePath: /
+//     Version: 1.0.0
+//     License: MIT http://opensource.org/licenses/MIT
+//     Contact: Janit Sri<janits_27@hotmail.com> https://janit.dev
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+// swagger:meta
 package main
 
 import (
@@ -11,6 +31,7 @@ import (
 	"products-api/handlers"
 	"time"
 
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -24,39 +45,6 @@ func main() {
 	mongo := data.NewMongoDB(mongoUsername, mongoPassword, mongoDB)
 	data.InitializeDBConnection(mongo)
 	defer data.CloseDBConnection(mongo)
-	//data.GetAllProducts(mongo)
-	//data.GetProductByProductId(mongo, 2)
-
-	/*product := data.Product{
-		Title:       "Test Item",
-		Price:       99.99,
-		Description: "Test Description",
-		Category:    "Test Category",
-		Image:       "www.testimage.com",
-		Ratings: &data.Rating{
-			Rate:  2.5,
-			Count: 565,
-		},
-	}
-
-	data.AddProduct(mongo, product)*/
-
-	//data.DeleteProduct(mongo, 90)
-
-	/*updateProduct := data.Product{
-		ProductId: 90,
-		Title:     "Test Item123",
-		Category:  "Test Category123",
-		Image:     "www.testimage123.com",
-		Ratings: &data.Rating{
-			Rate:  4.5,
-			Count: 123,
-		},
-	}
-
-	data.UpdateProduct(mongo, updateProduct)*/
-
-	//data.SearchProducts(mongo, "jacket")
 
 	l := log.New(os.Stdout, "products-api: ", log.LstdFlags)
 	p := handlers.NewProducts(l, mongo)
@@ -67,6 +55,11 @@ func main() {
 	getRouter.HandleFunc("/products", p.GetProductHandler)
 	getRouter.HandleFunc("/products/{id:[0-9]+}", p.GetProductByIdHandler)
 	getRouter.HandleFunc("/products/search", p.SearchProductHandler)
+
+	opts := middleware.RedocOpts{SpecURL: "./swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+	getRouter.Handle("/docs", sh)
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	postRouter := r.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/products", p.AddProductHandler)

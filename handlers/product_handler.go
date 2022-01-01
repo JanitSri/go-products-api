@@ -21,6 +21,57 @@ func NewProducts(l *log.Logger, db data.DataStore) *Products {
 	return &Products{l, db}
 }
 
+// List of products returned in the response
+// swagger:response productsResponse
+type ProductsResponse struct {
+	// All the products available
+	// in: body
+	Body []data.Product
+}
+
+// swagger:parameters listProduct deleteProduct
+type ProductIDParam struct {
+	// The ID of the product
+	// in: path
+	// required: true
+	ID int `json:"id"`
+}
+
+// swagger:parameters searchProduct
+type SearchKeyQueryParam struct {
+	// The search term to search products
+	// in: query
+	SearchKey string `json:"searchKey"`
+}
+
+type SuccessfulResult struct {
+	Result string `json:"result"`
+}
+
+// Generic successful response returned
+// swagger:response genericResult
+type GenericResponse struct {
+	// Result of action
+	// in: body
+	Body SuccessfulResult
+}
+
+// swagger:route GET /products products listProducts
+//
+// Lists all products
+//
+// This will show all available products by default.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http
+//
+//     Responses:
+//       200: productsResponse
 func (p *Products) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("GET - Products")
 
@@ -35,6 +86,22 @@ func (p *Products) GetProductHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(d)
 }
 
+// swagger:route GET /products/{id} products listProduct
+//
+// List product by product ID
+//
+// This will show no products by default.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http
+//
+//     Responses:
+//       200: productsResponse
 func (p *Products) GetProductByIdHandler(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("GET - Product By ID")
 
@@ -56,12 +123,28 @@ func (p *Products) GetProductByIdHandler(w http.ResponseWriter, r *http.Request)
 	w.Write(d)
 }
 
+// swagger:route POST /products products addProduct
+//
+// Add a product
+//
+// This will add a product to the system.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http
+//
+//     Responses:
+//       200: genericResult
 func (p *Products) AddProductHandler(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("POST - Add Product")
 
 	prod := r.Context().Value(KeyProduct{}).(data.Product)
 	result := data.AddProduct(p.db, prod)
-	res := fmt.Sprintf(`{"Product Added With Mongo ID":"%s"}`, result)
+	res := fmt.Sprintf(`{"Result":"Product Added With Mongo ID: %s"}`, result)
 	rawNotFound := json.RawMessage(res)
 	bytes, _ := rawNotFound.MarshalJSON()
 
@@ -69,13 +152,29 @@ func (p *Products) AddProductHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(bytes)
 }
 
+// swagger:route DELETE /products/{id} products deleteProduct
+//
+// Delete product by product ID
+//
+// This will delete a product by product ID.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http
+//
+//     Responses:
+//       200: genericResult
 func (p *Products) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("DELETE - Delete Product")
 
 	id := getId(w, r)
 	result := data.DeleteProduct(p.db, uint32(id))
 
-	res := fmt.Sprintf(`{"Number of Products Deleted":"%d"}`, result)
+	res := fmt.Sprintf(`{"Result":"Number of Products Deleted: %d"}`, result)
 	rawNotFound := json.RawMessage(res)
 	bytes, _ := rawNotFound.MarshalJSON()
 
@@ -83,12 +182,28 @@ func (p *Products) DeleteProductHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write(bytes)
 }
 
+// swagger:route PUT /products/ products updateProduct
+//
+// Update product
+//
+// This will update a product in the system.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http
+//
+//     Responses:
+//       200: genericResult
 func (p *Products) UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("PUT - Update Product")
 
 	prod := r.Context().Value(KeyProduct{}).(data.Product)
 	result := data.UpdateProduct(p.db, prod)
-	res := fmt.Sprintf(`{"Number of Product Updated":"%d"}`, result)
+	res := fmt.Sprintf(`{"Result":"Number of Product Updated: %d"}`, result)
 	rawNotFound := json.RawMessage(res)
 	bytes, _ := rawNotFound.MarshalJSON()
 
@@ -96,6 +211,22 @@ func (p *Products) UpdateProductHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write(bytes)
 }
 
+// swagger:route GET /products/search?searchKey={searchKey} products searchProduct
+//
+// Search products
+//
+// This will allow to search the products in the system.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http
+//
+//     Responses:
+//       200: productsResponse
 func (p *Products) SearchProductHandler(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("GET - SEARCH PRODUCTS")
 

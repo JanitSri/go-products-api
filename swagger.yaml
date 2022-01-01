@@ -1,0 +1,222 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  ObjectID:
+    items:
+      format: uint8
+      type: integer
+    title: ObjectID is the BSON ObjectID type.
+    type: array
+    x-go-package: go.mongodb.org/mongo-driver/bson/primitive
+  Product:
+    description: Product defines the structure for an API product
+    properties:
+      _id:
+        $ref: '#/definitions/ObjectID'
+      category:
+        description: the category that the product belongs to
+        maxLength: 50
+        type: string
+        x-go-name: Category
+      description:
+        description: the description of the product
+        maxLength: 500
+        type: string
+        x-go-name: Description
+      id:
+        description: the id for the product
+        format: uint32
+        minimum: 1
+        type: integer
+        x-go-name: ProductId
+      image:
+        description: the image url of the product
+        type: string
+        x-go-name: Image
+      price:
+        description: the price of the product
+        format: double
+        minimum: 0.01
+        type: number
+        x-go-name: Price
+      rating:
+        $ref: '#/definitions/Rating'
+      title:
+        description: the name of the product
+        maxLength: 255
+        type: string
+        x-go-name: Title
+    type: object
+    x-go-package: products-api/data
+  Rating:
+    description: Rating defines the structure for an rating of a Product
+    properties:
+      count:
+        description: the number of total ratings for the product
+        format: uint64
+        minimum: 1
+        type: integer
+        x-go-name: Count
+      rate:
+        description: the rating for the product
+        format: double
+        type: number
+        x-go-name: Rate
+    type: object
+    x-go-package: products-api/data
+  SuccessfulResult:
+    properties:
+      result:
+        type: string
+        x-go-name: Result
+    type: object
+    x-go-package: products-api/handlers
+host: localhost
+info:
+  contact:
+    email: janits_27@hotmail.com
+    name: Janit Sri
+    url: https://janit.dev
+  description: |-
+    The products API will allow for reading, creating, updating,
+    deleting, & searching for products. It was built using GO, gorilla/mux,
+    and mongo-go-driver. Go-swagger was used for API documentation.
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+  title: Products API.
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: This will show all available products by default.
+      operationId: listProducts
+      produces:
+      - application/json
+      responses:
+        "200":
+          $ref: '#/responses/productsResponse'
+      schemes:
+      - http
+      summary: Lists all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: This will add a product to the system.
+      operationId: addProduct
+      produces:
+      - application/json
+      responses:
+        "200":
+          $ref: '#/responses/genericResult'
+      schemes:
+      - http
+      summary: Add a product
+      tags:
+      - products
+  /products/:
+    put:
+      consumes:
+      - application/json
+      description: This will update a product in the system.
+      operationId: updateProduct
+      produces:
+      - application/json
+      responses:
+        "200":
+          $ref: '#/responses/genericResult'
+      schemes:
+      - http
+      summary: Update product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: This will delete a product by product ID.
+      operationId: deleteProduct
+      parameters:
+      - description: The ID of the product
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          $ref: '#/responses/genericResult'
+      schemes:
+      - http
+      summary: Delete product by product ID
+      tags:
+      - products
+    get:
+      consumes:
+      - application/json
+      description: This will show no products by default.
+      operationId: listProduct
+      parameters:
+      - description: The ID of the product
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          $ref: '#/responses/productsResponse'
+      schemes:
+      - http
+      summary: List product by product ID
+      tags:
+      - products
+  /products/search?searchKey={searchKey}:
+    get:
+      consumes:
+      - application/json
+      description: This will allow to search the products in the system.
+      operationId: searchProduct
+      parameters:
+      - description: The search term to search products
+        in: query
+        name: searchKey
+        type: string
+        x-go-name: SearchKey
+      produces:
+      - application/json
+      responses:
+        "200":
+          $ref: '#/responses/productsResponse'
+      schemes:
+      - http
+      summary: Search products
+      tags:
+      - products
+produces:
+- application/json
+responses:
+  genericResult:
+    description: Generic successful response returned
+    schema:
+      $ref: '#/definitions/SuccessfulResult'
+  productsResponse:
+    description: List of products returned in the response
+    schema:
+      items:
+        $ref: '#/definitions/Product'
+      type: array
+schemes:
+- http
+swagger: "2.0"

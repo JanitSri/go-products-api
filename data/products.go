@@ -7,20 +7,68 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Rating defines the structure for an rating of a Product
+// swagger:model
 type Rating struct {
-	Rate  float64 `bson:"rate,omitempty" json:"rate,omitempty"`
-	Count uint64  `bson:"count,omitempty" json:"count,omitempty"`
+	// the rating for the product
+	//
+	// required: false
+	Rate float64 `bson:"rate,omitempty" json:"rate,omitempty"`
+
+	// the number of total ratings for the product
+	//
+	// required: false
+	// min: 1
+	Count uint64 `bson:"count,omitempty" json:"count,omitempty"`
 }
 
+// Product defines the structure for an API product
+// swagger:model
 type Product struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	ProductId   uint32             `bson:"id,omitempty" json:"id,omitempty"`
-	Title       string             `bson:"title,omitempty" json:"title,omitempty"`
-	Price       float64            `bson:"price,omitempty" json:"price,omitempty"`
-	Description string             `bson:"description,omitempty" json:"description,omitempty"`
-	Category    string             `bson:"category,omitempty" json:"category,omitempty"`
-	Image       string             `bson:"image,omitempty" json:"image,omitempty"`
-	Ratings     *Rating            `bson:"rating,omitempty" json:"rating,omitempty"`
+	// the mongo id for the product - generated automaticlly
+	//
+	// required: false
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+
+	// the id for the product
+	//
+	// required: false
+	// min: 1
+	ProductId uint32 `bson:"id,omitempty" json:"id,omitempty"`
+
+	// the name of the product
+	//
+	// required: false
+	// max length: 255
+	Title string `bson:"title,omitempty" json:"title,omitempty"`
+
+	// the price of the product
+	//
+	// required: false
+	// min: 0.01
+	Price float64 `bson:"price,omitempty" json:"price,omitempty"`
+
+	// the description of the product
+	//
+	// required: false
+	// max length: 500
+	Description string `bson:"description,omitempty" json:"description,omitempty"`
+
+	// the category that the product belongs to
+	//
+	// required: false
+	// max length: 50
+	Category string `bson:"category,omitempty" json:"category,omitempty"`
+
+	// the image url of the product
+	//
+	// required: false
+	Image string `bson:"image,omitempty" json:"image,omitempty"`
+
+	// the rating for the product
+	//
+	// required: false
+	Ratings *Rating `bson:"rating,omitempty" json:"rating,omitempty"`
 }
 
 type Products []Product
